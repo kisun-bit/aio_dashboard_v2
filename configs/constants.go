@@ -3,6 +3,16 @@ package configs
 import "time"
 
 const (
+	// NameUI 名称放大版字体UI
+	NameUI = `
+██████╗  █████╗ ███████╗██╗  ██╗██████╗  ██████╗  █████╗ ██████╗ ██████╗ 
+██╔══██╗██╔══██╗██╔════╝██║  ██║██╔══██╗██╔═══██╗██╔══██╗██╔══██╗██╔══██╗
+██║  ██║███████║███████╗███████║██████╔╝██║   ██║███████║██████╔╝██║  ██║
+██║  ██║██╔══██║╚════██║██╔══██║██╔══██╗██║   ██║██╔══██║██╔══██╗██║  ██║
+██████╔╝██║  ██║███████║██║  ██║██████╔╝╚██████╔╝██║  ██║██║  ██║██████╔╝
+╚═════╝ ╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚═════╝  ╚═════╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚═════╝
+`
+
 	// MinGoVersion 最小 Go 版本
 	MinGoVersion = 1.16
 
@@ -10,7 +20,19 @@ const (
 	ProjectVersion = "v1.0.0"
 
 	// ProjectName 项目名称
-	ProjectName = "aio-dashboard"
+	ProjectName = "aio_dashboard"
+
+	// ProjectDisplayName 项目对外显示名称
+	ProjectDisplayName
+
+	// ProjectDescription 项目描述
+	ProjectDescription = "鸿凯数据备份与恢复管理系统"
+
+	// ProjectBaseDir 项目安装目录
+	ProjectBaseDir = "/usr/sbin/aio/dashboard"
+
+	// ProjectDepends 项目依赖，以`,`分割
+	ProjectDepends = `Requires=network.target,After=network-online.target syslog.target`
 
 	// ProjectDomain 项目域名
 	ProjectDomain = "http://127.0.0.1"

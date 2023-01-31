@@ -1,11 +1,7 @@
 package main
 
 import (
-	"fmt"
-	"github.com/kisun-bit/aio_dashboard/configs"
-	"github.com/kisun-bit/aio_dashboard/pkg/env"
-	"github.com/kisun-bit/aio_dashboard/pkg/logger"
-	"github.com/kisun-bit/aio_dashboard/pkg/timeutil"
+	"github.com/kisun-bit/aio_dashboard/internal/log"
 )
 
 // @title swagger 接口文档
@@ -27,22 +23,14 @@ import (
 func main() {
 
 	// 初始化全局日志记录器
-	globalLogger := logger.NewLogger(
-		logger.WithDisableConsole(),
-		logger.WithField("env", fmt.Sprintf("%s[%s]", configs.ProjectName, env.Active().Value())),
-		logger.WithTimeLayout(timeutil.CSTLayout),
-		logger.WithFileRotation(logger.GenerateDefaultLBJWriter(configs.ProjectAccessLogFile)))
+	globalLogger := log.NewGlobalLogger()
 
 	// 初始化后台日志记录器
-	backendLogger := logger.NewLogger(
-		logger.WithDisableConsole(),
-		logger.WithField("env", fmt.Sprintf("%s[%s]", configs.ProjectName, env.Active().Value())),
-		logger.WithTimeLayout(timeutil.CSTLayout),
-		logger.WithFileRotation(logger.GenerateDefaultLBJWriter(configs.ProjectCronLogFile)))
+	cronLogger := log.NewCronLogger()
 
 	defer func() {
 		_ = globalLogger.Sync()
-		_ = backendLogger.Sync()
+		_ = cronLogger.Sync()
 	}()
 
 	// 依赖注入(postgresql、redis、nats)
