@@ -4,7 +4,7 @@ import "time"
 
 type Option func(*option)
 
-type Repo interface {
+type Operator interface {
 	i()
 	Set(key, value string, ttl time.Duration, options ...Option) error
 	Get(key string, options ...Option) (string, error)

@@ -1,7 +1,7 @@
 package configs
 
-// basicSettings 服务的基本配置
-type basicSettings struct {
+// BasicSettings 服务的基本配置
+type BasicSettings struct {
 	Name          string `json:"name"`
 	Version       string `json:"version"`
 	StartupMode   string `json:"startup_mode"`
@@ -13,8 +13,8 @@ type basicSettings struct {
 	GlobalLogPath string `json:"global_log_path"`
 }
 
-// postgresqlSettings 服务所依赖的postgresql连接配置
-type postgresqlSettings struct {
+// PostgresqlSettings 服务所依赖的postgresql连接配置
+type PostgresqlSettings struct {
 	Host     string `json:"host"`
 	Port     string `json:"port"`
 	User     string `json:"user"`
@@ -26,8 +26,8 @@ type postgresqlSettings struct {
 	MaxOpenConn     int `json:"max_open_conn"`
 }
 
-// redisSettings 服务所依赖的redis连接配置
-type redisSettings struct {
+// RedisSettings 服务所依赖的redis连接配置
+type RedisSettings struct {
 	Host     string `json:"host"`
 	Port     string `json:"port"`
 	Password string `json:"password"`
@@ -38,13 +38,16 @@ type redisSettings struct {
 	PoolSize    int `json:"pool_size"`
 }
 
-type Settings struct {
-	Basic      basicSettings
-	Postgresql postgresqlSettings
-	Redis      redisSettings
+type Setting struct {
+	Basic      BasicSettings
+	Postgresql PostgresqlSettings
+	Redis      RedisSettings
 	// TODO more
 }
 
-func init() {
+var Settings Setting = loadConfig()
+
+// loadConfig 加载【应用基础配置】、【数据库配置】、【缓存配置】、【消息队列配置】等
+func loadConfig() Setting {
 
 }

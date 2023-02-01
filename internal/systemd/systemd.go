@@ -1,32 +1,84 @@
 package systemd
 
-import "github.com/kardianos/service"
+import (
+	"github.com/kardianos/service"
+	"github.com/kisun-bit/aio_dashboard/configs"
+	"go.uber.org/zap"
+	"strings"
+	"time"
+)
 
-// AIODashboardService aio_dashboard以systemd后台运行
-type AIODashboardService struct {
-	Backend *BackendIntegration // aio_dashboard服务集成
-	exit    chan struct{}
+type SrvCtlInstruction string
+
+const (
+	Install   SrvCtlInstruction = "install"
+	Uninstall SrvCtlInstruction = "uninstall"
+	Start     SrvCtlInstruction = "start"
+	Stop      SrvCtlInstruction = "stop"
+)
+
+// Systemctl dashboard服务实现系统管理
+type Systemctl struct {
+	globalLogger,
+	cronLogger *zap.SugaredLogger
+	srv *BackendServer
 }
 
-func (aio *AIODashboardService) Start(s service.Service) (err error) {
-	if service.Interactive() {
-		// 运行在控制台
-	} else {
-		// 运行在systemd
+func NewDashboardSrv(cfg configs.BasicSettings, globalLogger, cronLogger *zap.SugaredLogger) (service.Service, error) {
+	srvConfig := &service.Config{
+		Name:         cfg.Name,
+		DisplayName:  cfg.DisplayName,
+		Description:  cfg.Description,
+		Dependencies: strings.Split(cfg.SrvDepends, ","),
 	}
 
-	aio.exit = make(chan struct{})
+	ctl := new(Systemctl)
+	ctl.globalLogger = globalLogger
+	ctl.cronLogger = cronLogger
 
-	go aio.run()
+	return service.New(ctl, srvConfig)
+}
 
+func ParseInstFromArgs(args ...string) SrvCtlInstruction {
+	if len(args) <= 1 {
+		return Install
+	}
+	return SrvCtlInstruction(args[1])
+}
+
+// ResponseInst 响应服务控制指令
+// 当inst为非法指令(未被定义)时，以Run指令执行
+func ResponseInst(srv service.Service, inst SrvCtlInstruction) error {
+	switch inst {
+	case Install:
+		return srv.Install()
+	case Uninstall:
+		return srv.Uninstall()
+	case Start:
+		return srv.Start()
+	case Stop:
+		return srv.Stop()
+	default:
+		return srv.Run()
+	}
+}
+
+func (control *Systemctl) Start(service.Service) error {
+	if service.Interactive() {
+		control.globalLogger.Info("running in terminal")
+	} else {
+		control.globalLogger.Info("running under service manager")
+	}
+
+	go control.run()
 	return nil
 }
 
-func (aio *AIODashboardService) run() {
+func (control *Systemctl) run() {
 	// 执行服务
 }
 
-func (aio *AIODashboardService) Stop(s service.Service) (err error) {
-	close(aio.exit)
+func (control *Systemctl) Stop(service.Service) (err error) {
+	time.Sleep(2 * time.Second)
 	return err
 }

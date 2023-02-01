@@ -1,7 +1,10 @@
 package main
 
 import (
+	"github.com/kisun-bit/aio_dashboard/configs"
 	"github.com/kisun-bit/aio_dashboard/internal/log"
+	"github.com/kisun-bit/aio_dashboard/internal/systemd"
+	"os"
 )
 
 // @title swagger 接口文档
@@ -21,11 +24,7 @@ import (
 
 // @BasePath /
 func main() {
-
-	// 初始化全局日志记录器
 	globalLogger := log.NewGlobalLogger()
-
-	// 初始化后台日志记录器
 	cronLogger := log.NewCronLogger()
 
 	defer func() {
@@ -33,6 +32,14 @@ func main() {
 		_ = cronLogger.Sync()
 	}()
 
-	// 依赖注入(postgresql、redis、nats)
+	srv, err := systemd.NewDashboardSrv(configs.Settings.Basic, globalLogger, cronLogger)
+	if err != nil {
+		globalLogger.Fatalf("init dashboard service: %v", err)
+	}
 
+	inst := systemd.ParseInstFromArgs(os.Args...)
+	err = systemd.ResponseInst(srv, inst)
+	if err != nil {
+		globalLogger.Fatalf("control dashboard service [%v]: %v", inst, err)
+	}
 }
