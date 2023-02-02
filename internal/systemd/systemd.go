@@ -17,19 +17,18 @@ const (
 	Stop      SrvCtlInstruction = "stop"
 )
 
-// Systemctl dashboard服务实现系统管理
 type Systemctl struct {
 	globalLogger,
 	cronLogger *zap.SugaredLogger
 	srv *BackendServer
 }
 
-func NewDashboardSrv(cfg configs.BasicSettings, globalLogger, cronLogger *zap.SugaredLogger) (service.Service, error) {
+func NewDashboardSrv(globalLogger, cronLogger *zap.SugaredLogger) (service.Service, error) {
 	srvConfig := &service.Config{
-		Name:         cfg.Name,
-		DisplayName:  cfg.DisplayName,
-		Description:  cfg.Description,
-		Dependencies: strings.Split(cfg.SrvDepends, ","),
+		Name:         configs.Settings.Base.Name,
+		DisplayName:  configs.Settings.Base.DisplayName,
+		Description:  configs.Settings.Base.Description,
+		Dependencies: strings.Split(configs.Settings.Base.SrvDepends, ","),
 	}
 
 	ctl := new(Systemctl)
@@ -75,7 +74,7 @@ func (control *Systemctl) Start(service.Service) error {
 }
 
 func (control *Systemctl) run() {
-	// 执行服务
+	// TODO 执行服务
 }
 
 func (control *Systemctl) Stop(service.Service) (err error) {

@@ -5,7 +5,9 @@ go 1.19
 require (
 	github.com/gin-gonic/gin v1.8.2
 	github.com/kardianos/service v1.2.2
+	github.com/pkg/errors v0.8.1
 	go.uber.org/zap v1.24.0
+	gopkg.in/ini.v1 v1.67.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gorm.io/gorm v1.24.3
 )

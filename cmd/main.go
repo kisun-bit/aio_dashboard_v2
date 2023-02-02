@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/kisun-bit/aio_dashboard/configs"
-	"github.com/kisun-bit/aio_dashboard/internal/log"
-	"github.com/kisun-bit/aio_dashboard/internal/systemd"
 	"os"
+
+	"github.com/kisun-bit/aio_dashboard/configs"
+	"github.com/kisun-bit/aio_dashboard/internal/systemd"
+	"github.com/kisun-bit/aio_dashboard/pkg/logger"
 )
 
 // @title swagger 接口文档
@@ -24,22 +25,22 @@ import (
 
 // @BasePath /
 func main() {
-	globalLogger := log.NewGlobalLogger()
-	cronLogger := log.NewCronLogger()
+	gLogger := logger.NewLoggerWithDefaultOptions(configs.Settings.Base.Name, configs.Settings.Base.GlobalLogPath)
+	cLogger := logger.NewLoggerWithDefaultOptions(configs.Settings.Base.Name, configs.Settings.Base.CronLoggerPath)
 
 	defer func() {
-		_ = globalLogger.Sync()
-		_ = cronLogger.Sync()
+		_ = gLogger.Sync()
+		_ = cLogger.Sync()
 	}()
 
-	srv, err := systemd.NewDashboardSrv(configs.Settings.Basic, globalLogger, cronLogger)
-	if err != nil {
-		globalLogger.Fatalf("init dashboard service: %v", err)
+	srv, eNewSrv := systemd.NewDashboardSrv(gLogger, cLogger)
+	if eNewSrv != nil {
+		gLogger.Fatalf("init dashboard service: %v", eNewSrv)
 	}
 
 	inst := systemd.ParseInstFromArgs(os.Args...)
-	err = systemd.ResponseInst(srv, inst)
-	if err != nil {
-		globalLogger.Fatalf("control dashboard service [%v]: %v", inst, err)
+	eResp := systemd.ResponseInst(srv, inst)
+	if eResp != nil {
+		gLogger.Fatalf("control dashboard service [%v]: %v", inst, eResp)
 	}
 }

@@ -1,6 +1,9 @@
 package logger
 
 import (
+	"fmt"
+	"github.com/kisun-bit/aio_dashboard/pkg/env"
+	"github.com/kisun-bit/aio_dashboard/pkg/timeutil"
 	"io"
 	"os"
 	"path/filepath"
@@ -194,4 +197,12 @@ func NewLogger(opts ...Option) *zap.SugaredLogger {
 	}
 
 	return logger.Sugar()
+}
+
+func NewLoggerWithDefaultOptions(identityString, logPath string) *zap.SugaredLogger {
+	return NewLogger(
+		WithDisableConsole(),
+		WithField("env", fmt.Sprintf("%s[%s]", identityString, env.Active().Value())),
+		WithTimeLayout(timeutil.CSTLayout),
+		WithFileRotation(GenerateDefaultLBJWriter(logPath)))
 }
